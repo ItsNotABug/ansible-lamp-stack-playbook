@@ -5,6 +5,7 @@ This is a Ansible Playbook to deploy a LAMP Stack infrastructure on ubuntu/debia
 * apache2
 * mysql 
 * php7.0-fpm 
+* redis
 
 ### Pre-requisites
 You must have Ansible 2.3 installed.

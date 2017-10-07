@@ -1,0 +1,6 @@
+- name: install redis packages
+  become: true
+  apt: pkg={{ item }} state=installed update_cache=true
+  with_items:
+    - redis-server
+    - redis-tools

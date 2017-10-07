@@ -1,0 +1,36 @@
+---
+- name: Update repositories
+  apt:
+    update_cache: yes
+
+- name: apt get upgrade dist
+  apt:
+    upgrade: dist
+
+- name: apt get upgrade
+  apt:
+    upgrade: yes
+
+- name:  Install apache2 web server
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-boto
+    - python-software-properties
+    - npm
+    - curl
+    - git
+    - htop
+    - ruby-compass
+    - bundler
+    - ruby-dev
+    - build-essential
+    - composer
+    - nodejs
+    - redis-server
+    - redis-tools
+    - gzip
+    - build-essential
+    - ssl-cert
+    - vim
