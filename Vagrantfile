@@ -20,22 +20,8 @@ Vagrant.configure("2") do |config|
         host = RbConfig::CONFIG['host_os']
         vb.gui = false
 
-        if host =~ /darwin/
-            cpus = `sysctl -n hw.ncpu`.to_i
-            mem = `sysctl -n hw.memsize`.to_i / 1024 / 3072 / 3
-
-        elsif host =~ /linux/
-            cpus = `nproc`.to_i
-            mem = `grep 'MemTotal' /proc/meminfo | sed -e 's/MemTotal://' -e 's/ kB//'`.to_i / 3072 / 3
-
-        # Windows...
-        else
-            cpus = 3
-            mem = 3072
-        end
-
-        vb.customize ["modifyvm", :id, "--memory", mem]
-        vb.customize ["modifyvm", :id, "--cpus", cpus]
+        vb.customize ["modifyvm", :id, "--memory", 3072]
+        vb.customize ["modifyvm", :id, "--cpus", 3]
     end
 
     config.vm.provision :shell, path: "vagrant/bootstrap.sh"
