@@ -1,2 +1,4 @@
 .idea
 ansible/*.retry
+.vagrant/
+*.log

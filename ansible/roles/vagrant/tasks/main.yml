@@ -1,0 +1,24 @@
+---
+- name: install xdebug
+  apt:
+    name: php-xdebug
+    state: latest
+
+- name: configure xdebug
+  lineinfile:
+    path=/etc/php/7.0/mods-available/xdebug.ini
+    line="{{ item }}"
+    owner=ubuntu
+    regexp="^{{ item }}$"
+    state=present
+    insertafter=EOF
+  with_items:
+    - "xdebug.remote_enable=1"
+    - "xdebug.remote_host=10.0.2.15"
+    - "xdebug.remote_port=9000"
+    - "xdebug.remote_connect_back=on"
+    - "xdebug.idekey='vagrant'"
+
+- service:
+    name: apache2
+    state: started

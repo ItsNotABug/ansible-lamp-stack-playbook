@@ -14,14 +14,24 @@
   become: yes
   service: name=mysql state=started enabled=yes
 
-- name: Update MySQL root password for all root accounts
-  mysql_user: name=root 
-              host={{ item }} 
-              password={{ mysql_root_password }}
-              login_user=root
-              login_password=""
-              state=present
-  with_items:
-    - 127.0.0.1
-    - ::1
-    - localhost
+- name: configure root mysql credentials
+  copy:
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      [client]
+      user=root
+      password={{ mysql_root_password }}
+
+- name: configure root mysql credentials
+  copy:
+    dest: /home/ubuntu/.my.cnf
+    owner: ubuntu
+    group: ubuntu
+    mode: 0644
+    content: |
+      [client]
+      user=root
+      password={{ mysql_root_password }}
