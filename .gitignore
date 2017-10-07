@@ -2,3 +2,4 @@
 ansible/*.retry
 .vagrant/
 *.log
+/vagrant/projects-list.php
