@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
     # Run Ansible on the Vagrant Guest
     config.vm.provision "ansible_local", run: "always" do |ansible|
         ansible.playbook = "/vagrant/ansible/vagrant.yml"
-        ansible.sudo = true
+        ansible.become = true
     end
 
 end
