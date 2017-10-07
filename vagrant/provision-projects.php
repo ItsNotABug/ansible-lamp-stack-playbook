@@ -7,6 +7,10 @@
  *
  * TODO: Support having a project-provision.ini file in different projects to allow for more customizable provisioning options. This would allow for things like: variable apache configuration locations, auto-creation of developer MySQL credentials, customized provisioning shell scripts, project-specific database provisioning, etc.
  */
+
+if(!file_exists('projects-list.php')) {
+	die('Missing projects-list.php file...'.PHP_EOL);
+}
 require_once('projects-list.php');
 
 foreach($projects as $project) {
