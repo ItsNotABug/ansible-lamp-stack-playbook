@@ -9,10 +9,22 @@
   - php-dom
   - php-xml
 
-- name: Configure php-fom with apache2
+- name: Configure php-fpm with apache2
   become: true
   copy: src=files/www.conf dest=/etc/php/7.0/fpm/pool.d/
+
+- name: Copy fcgi-php-fpm conf file
+  become: true
+  copy: src=files/fcgi-php-fpm.conf dest=/etc/apache2/conf-available/fcgi-php-fpm.conf
+
+- name: Enable fcgi-php-fpm apache config file
+  become: yes
+  command: a2enconf fcgi-php-fpm
 
 - name: Restart php-fpm
   become: yes
   service: name=php7.0-fpm state=restarted
+
+- name: Restart apache
+  become: yes
+  service: name=apache2 state=restarted
