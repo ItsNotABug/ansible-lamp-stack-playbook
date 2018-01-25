@@ -8,6 +8,12 @@
   - php-mysql
   - php-dom
   - php-xml
+  - php-zip
+  - php-mbstring
+  - php-odbc
+  - php-mcrypt
+
+
 
 - name: Configure php-fpm with apache2
   become: true

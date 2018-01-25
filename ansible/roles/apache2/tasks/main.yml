@@ -7,8 +7,18 @@
     - libapache2-mod-fastcgi
 
 - name: Enable apache2 modules
-  become: yes
-  command: a2enmod rewrite actions alias fastcgi proxy_fcgi ssl expires
+  apache2_module:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - rewrite
+    - actions
+    - alias
+    - fastcgi
+    - proxy_fcgi
+    - ssl
+    - expires
+    - headers
 
 - name: Upload apache2 default configuration
   become: yes
