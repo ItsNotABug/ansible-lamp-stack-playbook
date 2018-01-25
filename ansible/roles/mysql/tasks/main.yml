@@ -36,7 +36,6 @@
     - python-mysqldb
     - libmysqlclient-dev
 
-
 - name : Ensure mysql started
   become: yes
   service: name=mysql state=started enabled=yes

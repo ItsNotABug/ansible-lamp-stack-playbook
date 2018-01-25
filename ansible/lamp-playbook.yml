@@ -13,5 +13,6 @@
     - apache2
     - mysql
     - php-fpm
+    - production
   vars:
-    mysql_root_password: "root"
+    mysql_root_password: "Password!!!!!"

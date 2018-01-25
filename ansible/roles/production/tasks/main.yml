@@ -1,0 +1,20 @@
+---
+
+
+- name: Upload MySQL monitor shell script
+  become: yes
+  copy: src=files/mysqlMonitor.sh dest=/root/mysqlMonitor.sh mode=0755
+
+- name: setup mysql service auto restarter
+  cron:
+    name: "Monitor MySQL service"
+    job: "/root/mysqlMonitor.sh"
+
+- name: Upload apache2 monitor shell script
+  become: yes
+  copy: src=files/apacheMonitor.sh dest=/root/apacheMonitor.sh mode=0755
+
+- name: setup apache service auto restarter
+  cron:
+    name: "Apache MySQL service"
+    job: "/root/apacheMonitor.sh"
