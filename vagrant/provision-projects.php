@@ -28,15 +28,30 @@ foreach($projects as $project) {
 		}
 
 		echo "Checking for apache configurations...".PHP_EOL;
+		$apache_found = 0;
 		if(file_exists($project_folder."/configs/apache/{$project['name']}.conf")) {
-			echo "-- Apache configs found, creating symlink".PHP_EOL;
+			echo "-- Standard Apache configs found, creating symlink".PHP_EOL;
 			if(symlink($project_folder."/configs/apache/{$project['name']}.conf", "/etc/apache2/sites-available/{$project['name']}.conf")) {
-				echo " -- Apache configuration symlink created, site is now available".PHP_EOL;
+				echo " -- Standard Apache configuration symlink created, site is now available".PHP_EOL;
 				shell_exec("a2ensite {$project['name']}.conf");
+				$apache_found++;
 			} else {
 				echo "-- FAILED to create apache symlink. Apache configurations must be manually setup for this project.".PHP_EOL;
 			}
-		} else {
+		}
+
+		if(file_exists($project_folder."/configs/apache/{$project['name']}.conf")) {
+			echo "-- SSL Apache configs found, creating symlink".PHP_EOL;
+			if(symlink($project_folder."/configs/apache/{$project['name']}-ssl.conf", "/etc/apache2/sites-available/{$project['name']}-ssl.conf")) {
+				echo " -- SSL Apache configuration symlink created, site is now available".PHP_EOL;
+				shell_exec("a2ensite {$project['name']}-ssl.conf");
+				$apache_found++;
+			} else {
+				echo "-- FAILED to create apache symlink. Apache configurations must be manually setup for this project.".PHP_EOL;
+			}
+		}
+
+		if($apache_found === 0){
 			echo "-- Apache configuration not found in $project_folder/configs/apache/{$project['name']}.conf. Apache configurations must be setup manually for this project.".PHP_EOL;
 		}
 
