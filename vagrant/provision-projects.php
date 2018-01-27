@@ -22,6 +22,7 @@ foreach($projects as $project) {
 		echo "- Configuring symbolic links".PHP_EOL;
 		if(symlink("/vagrant/projects/{$project['name']}", "/home/{$project['name']}")) {
 			echo "- Created symlink for /home/{$project['name']}".PHP_EOL;
+			$projects_home_folder = '/home/'.$project['name'];
 		} else {
 			echo "Failed to create /home/{$project['name']} sym link.".PHP_EOL;
 		}
@@ -37,6 +38,34 @@ foreach($projects as $project) {
 			}
 		} else {
 			echo "-- Apache configuration not found in $project_folder/configs/apache/{$project['name']}.conf. Apache configurations must be setup manually for this project.".PHP_EOL;
+		}
+
+		echo "Attempting to configure MySQL Databases...".PHP_EOl;
+
+		if(is_dir($project_folder.'/configs/db/')) {
+			$dbfiles = scandir($project_folder.'/configs/db/');
+			sort($dbfiles);
+			foreach($dbfiles as $dbfile) {
+				if($dbfile !== '.' && $dbfile !== '..') {
+					echo " -- Processing {$dbfile}...".PHP_EOL;
+					shell_exec("mysql -u{$mysql_user} -p{$mysql_pass} < {$project_folder}/{$dbfile}");
+				}
+			}
+		}
+		unset($dbfiles, $dbfile);
+
+		echo "Attempting to create symbolic links for SSL file...".PHP_EOL;
+		if(is_dir($project_folder.'/configs/ssl/')) {
+			$ssl_files = scandir($project_folder.'/configs/ssl/');
+			foreach($ssl_files as $ssl_file) {
+				if($ssl_file !== '.' && $ssl_file !== '..') {
+					if(symlink("{$projects_home_folder}/configs/ssl/$ssl_file", "/etc/apache2/ssl/{$ssl_file}")) {
+						echo "- Created symlink for /etc/apache2/ssl/{$ssl_file}".PHP_EOL;
+					} else {
+						echo "Failed to create /etc/apache2/ssl/{$ssl_file} sym link.".PHP_EOL;
+					}
+				}
+			}
 		}
 
 	} else {
