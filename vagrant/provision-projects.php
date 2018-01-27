@@ -55,7 +55,7 @@ foreach($projects as $project) {
 			echo "-- Apache configuration not found in $project_folder/configs/apache/{$project['name']}.conf. Apache configurations must be setup manually for this project.".PHP_EOL;
 		}
 
-		echo "Attempting to configure MySQL Databases...".PHP_EOl;
+		echo "Attempting to configure MySQL Databases...".PHP_EOL;
 
 		if(is_dir($project_folder.'/configs/db/')) {
 			$dbfiles = scandir($project_folder.'/configs/db/');
