@@ -96,7 +96,7 @@ Now that your production server is provisioned you will need to either manually 
 
 ### Project Provisioner
 
-The Project Provisioner is stored in the /vagrant folder in your dev environment and the /var/project_provisioner/ folder on other servers and is used as a simple way of pulling various projects into this list. The Project Provisioner assumes that you're projects are built with specific files in specific places. 
+The Project Provisioner is stored in the /vagrant folder in your dev environment and is used as a simple way of pulling various projects into this list. The Project Provisioner assumes that you're projects are built with specific files in specific places. 
 
 #### How It Works
 
@@ -111,6 +111,7 @@ First you'll need to copy the /vagrant/project-list-sample.php file to projects-
 3) **sudo php provision-projects.php**
 
 #### How to Use / Instructions (Production)
+1) Upload the project provisioner files (I recommend using SCP) to your production server, put them in the **/var/project_provisioner/** directory
 1) SSH into your production server
 2) **cd /var/project_provisioner/**
 3) Make sure the projects-list.php is configured properly
