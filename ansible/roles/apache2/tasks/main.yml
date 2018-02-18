@@ -33,6 +33,9 @@
   become: yes
   copy: src=files/index.php dest=/var/www/html/ mode=0644  
 
+- name: Creates apache2 ssl directory
+  file: path=/etc/apache2/ssl state=directory
+
 - name: Restart webserver
   become: yes
   service: name=apache2 state=restarted

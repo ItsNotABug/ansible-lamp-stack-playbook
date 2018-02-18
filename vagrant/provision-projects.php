@@ -13,12 +13,16 @@ if(!file_exists('projects-list.php')) {
 }
 require_once('projects-list.php');
 
+$projects_home_folder = '';
+
 foreach($projects as $project) {
 	echo "Starting {$project['name']}".PHP_EOL;
 	$project_folder = '../projects/'.$project['name'];
 	if(!is_dir($project_folder)) {
+		$projects['git_branch'] = isset($projects['git_branch']) ? $projects['git_branch'] : 'master';
 		echo "- Cloning repository...".PHP_EOL;
-		shell_exec( 'cd /vagrant/projects/ && git clone ' . $project['repository'] . ' ' . $project['name'] .' && git checkout dev');
+		shell_exec( 'cd /vagrant/projects/ && git clone ' . $project['repository'] . ' ' . $project['name'] );
+		shell_exec("cd /vagrant/projects/{$project['name']} && git fetch origin && git checkout origin/{$project['git_branch']} -b {$project['git_branch']} ");
 		echo "- Configuring symbolic links".PHP_EOL;
 		if(symlink("/vagrant/projects/{$project['name']}", "/home/{$project['name']}")) {
 			echo "- Created symlink for /home/{$project['name']}".PHP_EOL;
@@ -26,67 +30,71 @@ foreach($projects as $project) {
 		} else {
 			echo "Failed to create /home/{$project['name']} sym link.".PHP_EOL;
 		}
-
-		echo "Checking for apache configurations...".PHP_EOL;
-		$apache_found = 0;
-		if(file_exists($project_folder."/configs/apache/{$project['name']}.conf")) {
-			echo "-- Standard Apache configs found, creating symlink".PHP_EOL;
-			if(symlink($project_folder."/configs/apache/{$project['name']}.conf", "/etc/apache2/sites-available/{$project['name']}.conf")) {
-				echo " -- Standard Apache configuration symlink created, site is now available".PHP_EOL;
-				shell_exec("a2ensite {$project['name']}.conf");
-				$apache_found++;
-			} else {
-				echo "-- FAILED to create apache symlink. Apache configurations must be manually setup for this project.".PHP_EOL;
-			}
-		}
-
-		if(file_exists($project_folder."/configs/apache/{$project['name']}.conf")) {
-			echo "-- SSL Apache configs found, creating symlink".PHP_EOL;
-			if(symlink($project_folder."/configs/apache/{$project['name']}-ssl.conf", "/etc/apache2/sites-available/{$project['name']}-ssl.conf")) {
-				echo " -- SSL Apache configuration symlink created, site is now available".PHP_EOL;
-				shell_exec("a2ensite {$project['name']}-ssl.conf");
-				$apache_found++;
-			} else {
-				echo "-- FAILED to create apache symlink. Apache configurations must be manually setup for this project.".PHP_EOL;
-			}
-		}
-
-		if($apache_found === 0){
-			echo "-- Apache configuration not found in $project_folder/configs/apache/{$project['name']}.conf. Apache configurations must be setup manually for this project.".PHP_EOL;
-		}
-
-		echo "Attempting to configure MySQL Databases...".PHP_EOL;
-
-		if(is_dir($project_folder.'/configs/db/')) {
-			$dbfiles = scandir($project_folder.'/configs/db/');
-			sort($dbfiles);
-			foreach($dbfiles as $dbfile) {
-				if($dbfile !== '.' && $dbfile !== '..') {
-					echo " -- Processing {$dbfile}...".PHP_EOL;
-					shell_exec("mysql -u{$mysql_user} -p{$mysql_pass} < {$project_folder}/{$dbfile}");
+		if(!empty($projects_home_folder)) {
+			echo "Checking for apache configurations..." . PHP_EOL;
+			$apache_found = 0;
+			if ( file_exists( $projects_home_folder . "/configs/apache/{$project['name']}.conf" ) ) {
+				echo "-- Standard Apache configs found, creating symlink" . PHP_EOL;
+				if ( symlink( $projects_home_folder . "/configs/apache/{$project['name']}.conf", "/etc/apache2/sites-available/{$project['name']}.conf" ) ) {
+					echo " -- Standard Apache configuration symlink created, site is now available" . PHP_EOL;
+					shell_exec( "a2ensite {$project['name']}.conf" );
+					$apache_found ++;
+				} else {
+					echo "-- FAILED to create apache symlink. Apache configurations must be manually setup for this project." . PHP_EOL;
 				}
 			}
-		}
-		unset($dbfiles, $dbfile);
 
-		echo "Attempting to create symbolic links for SSL file...".PHP_EOL;
-		if(is_dir($project_folder.'/configs/ssl/')) {
-			$ssl_files = scandir($project_folder.'/configs/ssl/');
-			foreach($ssl_files as $ssl_file) {
-				if($ssl_file !== '.' && $ssl_file !== '..') {
-					if(symlink("{$projects_home_folder}/configs/ssl/$ssl_file", "/etc/apache2/ssl/{$ssl_file}")) {
-						echo "- Created symlink for /etc/apache2/ssl/{$ssl_file}".PHP_EOL;
-					} else {
-						echo "Failed to create /etc/apache2/ssl/{$ssl_file} sym link.".PHP_EOL;
+			if ( file_exists( $projects_home_folder . "/configs/apache/{$project['name']}-ssl.conf" ) ) {
+				echo "-- SSL Apache configs found, creating symlink" . PHP_EOL;
+				if ( symlink( $projects_home_folder . "/configs/apache/{$project['name']}-ssl.conf", "/etc/apache2/sites-available/{$project['name']}-ssl.conf" ) ) {
+					echo " -- SSL Apache configuration symlink created, site is now available" . PHP_EOL;
+					shell_exec( "a2ensite {$project['name']}-ssl.conf" );
+					$apache_found ++;
+				} else {
+					echo "-- FAILED to create apache symlink. Apache configurations must be manually setup for this project." . PHP_EOL;
+				}
+			}
+
+			if ( $apache_found === 0 ) {
+				echo "-- Apache configuration not found in $projects_home_folder/configs/apache/{$project['name']}.conf. Apache configurations must be setup manually for this project." . PHP_EOL;
+			}
+
+			echo "Attempting to configure MySQL Databases..." . PHP_EOL;
+
+			if ( is_dir( $projects_home_folder . '/configs/db/' ) ) {
+				$dbfiles = scandir( $projects_home_folder . '/configs/db/' );
+				sort( $dbfiles );
+				foreach ( $dbfiles as $dbfile ) {
+					if ( $dbfile !== '.' && $dbfile !== '..' ) {
+						echo " -- Processing {$dbfile}..." . PHP_EOL;
+						shell_exec( "mysql -u{$mysql_root_user} -p{$mysql_root_password} < {$projects_home_folder}/configs/db/{$dbfile}" );
 					}
 				}
 			}
-		}
+			unset( $dbfiles, $dbfile );
 
+			echo "Attempting to create symbolic links for SSL file..." . PHP_EOL;
+			if ( is_dir( $project_folder . '/configs/ssl/' ) ) {
+				$ssl_files = scandir( $project_folder . '/configs/ssl/' );
+				foreach ( $ssl_files as $ssl_file ) {
+					if ( $ssl_file !== '.' && $ssl_file !== '..' ) {
+						if ( symlink( "{$projects_home_folder}/configs/ssl/$ssl_file", "/etc/apache2/ssl/{$ssl_file}" ) ) {
+							echo "- Created symlink for /etc/apache2/ssl/{$ssl_file}" . PHP_EOL;
+						} else {
+							echo "Failed to create /etc/apache2/ssl/{$ssl_file} sym link." . PHP_EOL;
+						}
+					}
+				}
+			}
+		} else {
+			echo "- Project did not clone correctly.".PHP_EOL;
+		}
 	} else {
 		echo "- Project already configured".PHP_EOL;
 	}
 
+
+	$projects_home_folder = '';
 }
 
 echo PHP_EOL.'Testing Apache Configurations'.PHP_EOL;
