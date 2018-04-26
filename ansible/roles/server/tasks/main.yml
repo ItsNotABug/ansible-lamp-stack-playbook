@@ -3,10 +3,6 @@
   apt:
     update_cache: yes
 
-- name: apt get upgrade
-  apt:
-    upgrade: yes
-
 - name:  Install apache2 web server
   apt:
     name: "{{ item }}"
@@ -30,3 +26,4 @@
     - build-essential
     - ssl-cert
     - vim
+    - composer
