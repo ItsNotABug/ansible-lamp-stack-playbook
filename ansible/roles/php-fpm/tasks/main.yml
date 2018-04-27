@@ -13,8 +13,6 @@
   - php-odbc
   - php-mcrypt
 
-
-
 - name: Configure php-fpm with apache2
   become: true
   copy: src=files/www.conf dest=/etc/php/7.0/fpm/pool.d/

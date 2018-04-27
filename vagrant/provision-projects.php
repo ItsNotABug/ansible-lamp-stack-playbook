@@ -73,18 +73,15 @@ foreach($projects as $project) {
 			}
 			unset( $dbfiles, $dbfile );
 
-			echo "Attempting to create symbolic links for SSL file..." . PHP_EOL;
+			echo "Attempting to create symbolic links for SSL directory..." . PHP_EOL;
 			if ( is_dir( $project_folder . '/configs/ssl/' ) ) {
 				$ssl_files = scandir( $project_folder . '/configs/ssl/' );
-				foreach ( $ssl_files as $ssl_file ) {
-					if ( $ssl_file !== '.' && $ssl_file !== '..' ) {
-						if ( symlink( "{$projects_home_folder}/configs/ssl/$ssl_file", "/etc/apache2/ssl/{$ssl_file}" ) ) {
-							echo "- Created symlink for /etc/apache2/ssl/{$ssl_file}" . PHP_EOL;
-						} else {
-							echo "Failed to create /etc/apache2/ssl/{$ssl_file} sym link." . PHP_EOL;
-						}
+					if ( symlink( "{$projects_home_folder}/configs/ssl/", "/etc/apache2/ssl/{$project['name']}" ) ) {
+						echo "- Created symlink for /etc/apache2/ssl/{$project['name']}" . PHP_EOL;
+					} else {
+						echo "Failed to create /etc/apache2/ssl/{$project['name']} sym link." . PHP_EOL;
 					}
-				}
+
 			}
 		} else {
 			echo "- Project did not clone correctly.".PHP_EOL;
